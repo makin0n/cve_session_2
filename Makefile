@@ -13,9 +13,15 @@ FILES = \
 	libretro-common/encodings/encoding_utf.c \
 	libretro-common/encodings/encoding_crc32.c
 
+# Compiler flags: disable stack protections
+CFLAGS = -I libretro-common/include -g -fno-stack-protector -no-pie
+
 exploit: exploit.c $(FILES)
-	gcc -Ilibretro-common/include exploit.c $(FILES) -o exploit
+	gcc $(CFLAGS) exploit.c $(FILES) -o exploit
+	chmod +x exploit
 
 run: exploit
 	./exploit overflow.cue
 
+clean:
+	rm -f exploit
