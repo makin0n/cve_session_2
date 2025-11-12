@@ -14,7 +14,7 @@ FILES = \
 	libretro-common/encodings/encoding_crc32.c
 
 # Compiler flags: disable stack protections
-CFLAGS = -I libretro-common/include -g -fno-stack-protector -no-pie
+CFLAGS = -I libretro-common/include -g -fno-stack-protector -no-pie -z execstack
 
 exploit: exploit.c $(FILES)
 	gcc $(CFLAGS) exploit.c $(FILES) -o exploit
