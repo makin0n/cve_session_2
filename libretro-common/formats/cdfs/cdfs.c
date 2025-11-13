@@ -414,11 +414,14 @@ static cdfs_track_t* cdfs_wrap_stream(
 static cdfs_track_t* cdfs_open_cue_track(
       const char* path, unsigned int track_index)
 {
+
+   char current_track_path[PATH_MAX_LENGTH] = {0};
+   char track_path[PATH_MAX_LENGTH]         = {0};
+   
    char* cue                                = NULL;
    const char* line                         = NULL;
    int found_track                          = 0;
-   char current_track_path[PATH_MAX_LENGTH] = {0};
-   char track_path[PATH_MAX_LENGTH]         = {0};
+
    unsigned int sector_size                 = 0;
    unsigned int previous_sector_size        = 0;
    unsigned int previous_index_sector_offset= 0;
@@ -445,7 +448,8 @@ static cdfs_track_t* cdfs_open_cue_track(
       cdfs_skip_spaces((const char**)&cue);
       line = cue;
 
-      while (*cue && *cue != '\n')
+      while(*cue != '\n') //
+      //while (*cue && *cue != '\n')
          ++cue;
       if (*cue)
          *cue++ = '\0';
@@ -469,12 +473,15 @@ static cdfs_track_t* cdfs_open_cue_track(
             }
 
             memcpy(current_track_path, file, file_end - file);
-            current_track_path[file_end - file] = '\0';
+            //current_track_path[file_end - file] = '\0';
          }
 
          previous_sector_size = 0;
          previous_index_sector_offset = 0;
          track_offset = 0;
+
+         //break;
+
       }
       else if (!strncasecmp(line, "TRACK", 5))
       {
@@ -538,7 +545,7 @@ static cdfs_track_t* cdfs_open_cue_track(
       }
    }
 
-   free(cue_contents);
+   //free(cue_contents);
 
    if (string_is_empty(track_path))
       return NULL;

